@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mi sello único</title>
+<style>
+  :root {
+    --navy: #1F3864;
+    --olive: #6B7B5E;
+    --gold: #B08A2E;
+    --bg: #FAF9F6;
+    --card: #FFFFFF;
+    --border: #E2DFD6;
+    --text: #2B2B2B;
+    --text-soft: #6b6b6b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 840px; margin: 0 auto; }
+  h1 { font-size: 22px; color: var(--navy); margin: 0 0 4px; }
+  .subtitle { font-size: 14px; color: var(--text-soft); font-style: italic; margin: 0 0 20px; }
+  .counter {
+    position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 5;
+    font-size: 13px; color: var(--navy); font-weight: 700; text-align: center;
+    border-bottom: 1px solid var(--border); margin-bottom: 16px;
+  }
+  .virtue-block { margin-bottom: 18px; }
+  .virtue-title { font-size: 13px; font-weight: 700; color: var(--navy); margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-family: Georgia, serif;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--olive); }
+  .chip.selected {
+    background: var(--olive);
+    border-color: var(--olive);
+    color: #fff;
+    font-weight: 700;
+  }
+  .chip.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+  .btn-row { text-align: center; margin: 26px 0 10px; }
+  button#reveal-btn {
+    border: none; border-radius: 999px; padding: 13px 30px; font-size: 14.5px; font-weight: 700;
+    font-family: Georgia, serif; cursor: not-allowed; background: #DDD8CB; color: #8a8a8a; transition: all 0.2s ease;
+  }
+  button#reveal-btn.active { cursor: pointer; background: var(--olive); color: #fff; }
+  button#reveal-btn.active:hover { background: #566349; }
+  #btn-hint { font-size: 11.5px; color: var(--text-soft); margin: 8px 0 0; text-align: center; }
+  .privacy-note { font-size: 11px; color: var(--text-soft); text-align: center; margin: 10px 0 24px; }
+
+  #result { display: none; margin-top: 10px; }
+  .seal-card {
+    border-radius: 16px; padding: 28px 24px; text-align: center;
+    background: linear-gradient(135deg, #EFEAE0, #E9F3F3);
+    border: 1px solid var(--border);
+    opacity: 0; transform: translateY(10px); transition: all 0.5s ease;
+  }
+  .seal-card .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--olive); margin: 0 0 10px; }
+  .seal-card .nombre { font-size: 26px; font-weight: 700; color: var(--navy); margin: 0 0 14px; }
+  .seal-card .descripcion { font-size: 15px; line-height: 1.6; color: var(--text); margin: 0; }
+  .fortalezas-usadas { font-size: 12px; color: var(--text-soft); text-align: center; margin: 14px 0 0; }
+  .disclaimer { font-size: 12px; color: var(--text-soft); text-align: center; font-style: italic; margin: 16px 0 0; }
+
+  .error-box { border: 1px solid #e0b8ae; background: #FBEBE8; border-radius: 12px; padding: 12px 14px; margin-top: 16px; }
+  .error-box p.title { margin: 0 0 4px; font-weight: 700; font-size: 13px; }
+  .error-box p.detail { margin: 0; font-size: 11.5px; color: #7a4a42; word-break: break-word; font-family: monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mi sello único</h1>
+  <p class="subtitle">Elige entre 2 y 4 fortalezas de carácter y descubre una posibilidad a desarrollar — no una ley, un punto de partida.</p>
+  <div class="counter" id="counter">0 de 4 seleccionadas</div>
+
+  <div id="strengths-container"></div>
+
+  <div class="btn-row">
+    <button id="reveal-btn" disabled>✦ Descubrir mi sello único</button>
+    <p id="btn-hint">Elige al menos 2 fortalezas para activar</p>
+  </div>
+  <p class="privacy-note">Tu selección no se guarda en ningún servidor — solo se usa en el momento para generar tu resultado.</p>
+
+  <div id="result">
+    <div class="seal-card" id="seal-card">
+      <p class="eyebrow">Tu sello único</p>
+      <p class="nombre" id="seal-nombre"></p>
+      <p class="descripcion" id="seal-descripcion"></p>
+    </div>
+    <p class="fortalezas-usadas" id="fortalezas-usadas"></p>
+    <p class="disclaimer">Esto es una posibilidad para explorar, no una ley ni un diagnóstico — que la desarrolles o no depende de ti.</p>
+  </div>
+</div>
+
+<script>
+const VIRTUES = [
+  { name: "Sabiduría y conocimiento", strengths: [
+    { n: "Creatividad", d: "Posee ideas originales y las aplica." },
+    { n: "Curiosidad", d: "Desea experimentar y conocer cosas nuevas." },
+    { n: "Apertura mental y juicio crítico", d: "Busca visiones y alternativas a las propias." },
+    { n: "Amor por aprender", d: "Profundización sistemática del conocimiento." },
+    { n: "Perspectiva", d: "Visión amplia de posibilidades." },
+  ]},
+  { name: "Valor", strengths: [
+    { n: "Valentía", d: "Enfrenta miedos, confronta la adversidad." },
+    { n: "Perseverancia", d: "Finaliza la tarea a pesar de los obstáculos." },
+    { n: "Honestidad", d: "Es auténtico e íntegro." },
+    { n: "Vitalidad", d: "Muestra entusiasmo y energía." },
+  ]},
+  { name: "Humanidad", strengths: [
+    { n: "Amor", d: "Muestra calidez afectiva y recíproca." },
+    { n: "Bondad", d: "Ayuda de manera desinteresada." },
+    { n: "Inteligencia social", d: "Sabe lo que los otros desean y buscan." },
+  ]},
+  { name: "Justicia", strengths: [
+    { n: "Trabajo en equipo", d: "Es colaborativo, participa con el grupo." },
+    { n: "Equidad", d: "Oportunidades iguales para todos." },
+    { n: "Liderazgo", d: "Influir positivamente en otros." },
+  ]},
+  { name: "Templanza", strengths: [
+    { n: "Perdón", d: "Da una segunda oportunidad cuando el otro se equivoca." },
+    { n: "Humildad", d: "No presume sus logros, deja que hablen por sí mismos." },
+    { n: "Prudencia", d: "Considera pros y contras de una situación." },
+    { n: "Autorregulación", d: "No se deja llevar por los impulsos." },
+  ]},
+  { name: "Trascendencia", strengths: [
+    { n: "Apreciación de la belleza y excelencia", d: "Valora las cosas de la vida." },
+    { n: "Gratitud", d: "Siente agradecimiento y lo expresa." },
+    { n: "Esperanza", d: "Espera un mejor futuro." },
+    { n: "Humor", d: "Encuentra motivos de juego y diversión." },
+    { n: "Espiritualidad", d: "Conecta con el sentido trascendente y sagrado de la vida." },
+  ]},
+];
+
+const container = document.getElementById('strengths-container');
+VIRTUES.forEach(v => {
+  const block = document.createElement('div');
+  block.className = 'virtue-block';
+  const title = document.createElement('p');
+  title.className = 'virtue-title';
+  title.textContent = v.name;
+  block.appendChild(title);
+  const row = document.createElement('div');
+  row.className = 'chip-row';
+  v.strengths.forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = s.n;
+    chip.dataset.name = s.n;
+    chip.dataset.def = s.d;
+    chip.addEventListener('click', () => toggleChip(chip));
+    row.appendChild(chip);
+  });
+  block.appendChild(row);
+  container.appendChild(block);
+});
+
+const MAX_SEL = 4;
+const MIN_SEL = 2;
+
+function selectedChips() {
+  return Array.from(document.querySelectorAll('.chip.selected'));
+}
+
+function toggleChip(chip) {
+  const sel = selectedChips();
+  if (chip.classList.contains('selected')) {
+    chip.classList.remove('selected');
+  } else {
+    if (sel.length >= MAX_SEL) return;
+    chip.classList.add('selected');
+  }
+  updateUI();
+}
+
+function updateUI() {
+  const sel = selectedChips();
+  document.getElementById('counter').textContent = `${sel.length} de ${MAX_SEL} seleccionadas`;
+  document.querySelectorAll('.chip').forEach(c => {
+    if (!c.classList.contains('selected') && sel.length >= MAX_SEL) {
+      c.classList.add('disabled');
+    } else {
+      c.classList.remove('disabled');
+    }
+  });
+  const btn = document.getElementById('reveal-btn');
+  const hint = document.getElementById('btn-hint');
+  if (sel.length >= MIN_SEL) {
+    btn.disabled = false;
+    btn.classList.add('active');
+    hint.style.display = 'none';
+  } else {
+    btn.disabled = true;
+    btn.classList.remove('active');
+    hint.style.display = 'block';
+  }
+}
+
+function extractJson(raw) {
+  let clean = raw.trim();
+  if (clean.startsWith('```')) {
+    clean = clean.replace(/^```[a-zA-Z]*\n?/, '').replace(/```\s*$/, '').trim();
+  }
+  try { return JSON.parse(clean); }
+  catch (e) {
+    const match = clean.match(/\{[\s\S]*\}/);
+    if (match) return JSON.parse(match[0]);
+    throw e;
+  }
+}
+
+async function callGenerate(prompt, btnRef, attempt) {
+  attempt = attempt || 1;
+  const response = await fetch("/.netlify/functions/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
+  });
+  if (response.status === 429 && attempt <= 3) {
+    const waitSeconds = attempt * 4;
+    if (btnRef) btnRef.innerHTML = `⏳ Mucha gente usando la app — reintentando en ${waitSeconds}s...`;
+    await new Promise(res => setTimeout(res, waitSeconds * 1000));
+    return callGenerate(prompt, btnRef, attempt + 1);
+  }
+  return response;
+}
+
+async function reveal() {
+  const btn = document.getElementById('reveal-btn');
+  const result = document.getElementById('result');
+  const sealCard = document.getElementById('seal-card');
+  const originalLabel = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Cruzando tus fortalezas...';
+  result.style.display = 'none';
+  sealCard.style.opacity = '0';
+  sealCard.style.transform = 'translateY(10px)';
+
+  const sel = selectedChips();
+  const listado = sel.map(c => `- ${c.dataset.name}: ${c.dataset.def}`).join('\n');
+  const nombres = sel.map(c => c.dataset.name).join(', ');
+
+  const prompt = 'Una persona en un taller de bienestar organizacional seleccionó estas fortalezas de caracter de la Clasificacion VIA (Peterson & Seligman):\n' +
+    listado + '\n\n' +
+    'A partir del cruce especifico de estas fortalezas (no de una sola por separado), sugiere un "sello unico" o superpoder a desarrollar que nace de esa combinacion particular. ' +
+    'Dale un nombre corto y evocador (2 a 4 palabras, sin la palabra "superpoder" ni referencias a comics o superheroes) y una descripcion breve (maximo 35 palabras) de que la hace especial en esa combinacion y como podria desplegarla en su trabajo o su vida. ' +
+    'IMPORTANTE: preséntalo como una posibilidad a explorar, no como una verdad fija ni un diagnostico (evita frases como "tu eres" o "tu sello es"; mejor "una posibilidad que te habilita esta combinacion es..."). Tono calido, humano, cercano, no corporativo ni new age. ' +
+    'Responde SOLO con JSON valido, sin texto adicional ni markdown, con este formato exacto: {"nombre": "...", "descripcion": "..."}';
+
+  try {
+    const response = await callGenerate(prompt, btn);
+    if (response.status === 429) {
+      throw new Error('La app está muy usada en este momento (límite de solicitudes por minuto). Espera un minuto y vuelve a intentar.');
+    }
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error('HTTP ' + response.status + ': ' + errText.slice(0, 300));
+    }
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    const textBlock = (data.content || []).find(b => b.type === 'text');
+    if (!textBlock || !textBlock.text) throw new Error('Respuesta sin texto: ' + JSON.stringify(data).slice(0,300));
+    const parsed = extractJson(textBlock.text);
+    if (!parsed.nombre || !parsed.descripcion) throw new Error('El modelo no devolvió el formato esperado');
+
+    document.getElementById('seal-nombre').textContent = parsed.nombre;
+    document.getElementById('seal-descripcion').textContent = parsed.descripcion;
+    document.getElementById('fortalezas-usadas').textContent = 'A partir de: ' + nombres;
+    result.style.display = 'block';
+    setTimeout(() => { sealCard.style.opacity = '1'; sealCard.style.transform = 'translateY(0)'; }, 100);
+  } catch (err) {
+    result.style.display = 'block';
+    document.getElementById('seal-card').style.display = 'none';
+    document.getElementById('fortalezas-usadas').textContent = '';
+    let errBox = document.getElementById('err-box');
+    if (!errBox) {
+      errBox = document.createElement('div');
+      errBox.id = 'err-box';
+      errBox.className = 'error-box';
+      result.insertBefore(errBox, document.getElementById('fortalezas-usadas'));
+    }
+    errBox.innerHTML = '<p class="title">No se pudo generar el sello esta vez.</p><p class="detail">' + String(err.message || err).replace(/</g,'&lt;') + '</p>';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalLabel;
+  }
+}
+document.getElementById('reveal-btn').addEventListener('click', reveal);
+updateUI();
+</script>
+</body>
+</html>
