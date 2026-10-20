@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Cómo fluye mi coordinación con otros?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital@1&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F8F7EF; --beige:#EAE7DD; --slate:#678285; --deep:#033E57; --ink:#36474D;
+    --ochre:#A78445; --green:#6A8168; --sage:#9AA08F; --red:#752323; --yellow:#E8C061;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);color:var(--ink);font-family:"Poppins",system-ui,sans-serif;font-size:16px;line-height:1.5}
+  .wrap{max-width:640px;margin:0 auto;padding:24px 16px 40px}
+  header{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+  header img{width:22px;height:auto}
+  header span{font-family:"Libre Baskerville",Georgia,serif;font-style:italic;color:var(--slate);font-size:14px}
+  .progress{height:5px;background:var(--beige);border-radius:9px;overflow:hidden;margin-bottom:22px}
+  .progress div{height:100%;background:var(--ochre);width:0;transition:width .35s}
+  h1{font-weight:800;color:var(--slate);font-size:30px;line-height:1.15;text-transform:lowercase;margin-bottom:12px}
+  h2{font-weight:800;font-size:22px;line-height:1.2;text-transform:lowercase;margin-bottom:4px}
+  .serif{font-family:"Libre Baskerville",Georgia,serif;font-style:italic}
+  .lead{color:var(--ink);margin-bottom:18px}
+  .muted{color:var(--slate);font-size:14px}
+  .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:99px;color:#fff;margin-bottom:10px}
+  .tag.rel{background:var(--ochre)} .tag.com{background:var(--green)}
+  .card{background:#fff;border:1px solid var(--beige);border-radius:14px;padding:18px;margin-bottom:14px}
+  .card.soft{background:var(--beige);border-color:var(--beige)}
+  label.field{display:block;font-weight:600;color:var(--deep);margin-bottom:6px}
+  input[type=text],textarea{width:100%;font:inherit;padding:12px 14px;border:1.5px solid var(--beige);border-radius:10px;background:#fff;color:var(--ink)}
+  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--slate)}
+  .rubric{display:flex;justify-content:space-between;font-size:12px;color:var(--slate);margin:4px 2px 0}
+  .q{margin-bottom:18px}
+  .q p{font-weight:600;color:var(--deep);margin-bottom:10px}
+  .q .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;color:#fff;font-size:13px;font-weight:700;margin-right:8px;vertical-align:1px}
+  .rel .num{background:var(--ochre)} .com .num{background:var(--green)}
+  .q .ind{font-weight:800} .rel .ind{color:var(--ochre)} .com .ind{color:var(--green)}
+  .scale{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .scale button{font:inherit;font-weight:700;font-size:18px;padding:12px 0;border-radius:10px;border:1.5px solid var(--beige);background:var(--paper);color:var(--deep);cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .scale button:hover{border-color:var(--slate)}
+  .scale button.on{background:var(--deep);border-color:var(--deep);color:#fff}
+  .btn{display:block;width:100%;font:inherit;font-weight:700;font-size:16px;padding:15px;border:0;border-radius:99px;background:var(--deep);color:#fff;cursor:pointer;margin-top:8px}
+  .btn:disabled{background:#B9C4C5;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--deep);border:1.5px solid var(--deep)}
+  .btn.ochre{background:var(--ochre)}
+  .row{display:flex;gap:10px}
+  .row .btn{flex:1}
+  .hidden{display:none}
+  .groups{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .g{border-radius:14px;padding:14px;color:#fff}
+  .g.rel{background:var(--ochre)} .g.com{background:var(--green)}
+  .g .lbl{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+  .g .avg{font-size:30px;font-weight:800;line-height:1.1}
+  .g .sub{font-size:12px;opacity:.9}
+  .bars .b{display:grid;grid-template-columns:24px 1fr 28px;align-items:center;gap:8px;margin:7px 0;font-size:13px}
+  .bars .track{height:10px;background:var(--beige);border-radius:9px;overflow:hidden}
+  .bars .fill{height:100%;border-radius:9px}
+  .bars .b.low .n{color:var(--red);font-weight:800}
+  .bars .t{font-size:12px;color:var(--slate);grid-column:2/4;margin-top:-6px}
+  .focus{border:2px solid var(--deep);background:#fff;border-radius:14px;padding:18px;margin-bottom:14px}
+  .focus .quote{font-family:"Libre Baskerville",Georgia,serif;font-style:italic;color:var(--slate);font-size:15px;margin:6px 0 12px}
+  .focus ul{list-style:none;margin:0 0 12px}
+  .focus li{padding-left:18px;position:relative;margin-bottom:4px}
+  .focus li:before{content:"";position:absolute;left:2px;top:.65em;width:7px;height:7px;border-radius:50%;background:var(--ochre)}
+  .action{background:var(--beige);border-radius:10px;padding:10px 12px;font-weight:700;color:var(--green)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+  .chips button{font:inherit;font-size:13px;font-weight:600;padding:7px 12px;border-radius:99px;border:1.5px solid var(--deep);background:#fff;color:var(--deep);cursor:pointer}
+  .chips button.on{background:var(--deep);color:#fff}
+  .reading{border-radius:14px;padding:16px;margin-bottom:14px;color:#fff;background:var(--deep)}
+  .reading b{color:var(--yellow)}
+  .commit{background:var(--deep);color:#fff;border-radius:14px;padding:18px;margin-bottom:14px}
+  .commit h3{font-size:16px;margin-bottom:10px}
+  .commit .line{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center}
+  .commit .line span{font-weight:600;font-size:14px}
+  .commit input[type=text],.commit textarea{border-color:transparent;resize:none;line-height:1.35}
+  .commit .line span{align-self:start;padding-top:12px}
+  .copyok{font-size:13px;color:var(--yellow);margin-top:8px;min-height:1.2em}
+  footer{margin-top:22px;font-size:12px;color:var(--slate)}
+  footer p{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><img alt="" src="data:image/png;base64,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"><span>the good partner · Liderar desde donde estoy</span></header>
+  <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+
+  <!-- INICIO -->
+  <section id="s0">
+    <h1>¿cómo fluye mi coordinación con otros?</h1>
+    <p class="lead">La coordinación no falla solo por el procedimiento, sino por <b>la calidad de la relación</b> entre los roles que trabajan juntos.</p>
+    <div class="card">
+      <label class="field" for="who">Piensa en una persona o un área con la que trabajas seguido y donde algo se traba.</label>
+      <input id="who" type="text" placeholder="Ej.: contratista de terminaciones, área de compras…" autocomplete="off">
+      <p class="muted" style="margin-top:8px">No evalúas a la persona: evalúas cómo funciona la relación entre ustedes.</p>
+    </div>
+    <button class="btn" id="start">Comenzar</button>
+  </section>
+
+  <!-- RELACIONES -->
+  <section id="s1" class="hidden">
+    <span class="tag rel">Grupo 1 · Relaciones</span>
+    <h2 style="color:var(--ochre)">aspectos que miden la relación</h2>
+    <p class="muted" style="margin-bottom:6px">Pensando en <b id="who1">esa relación</b>, ponle nota a cada frase.</p>
+    <div class="rubric" style="margin-bottom:16px"><span>1 = no pasa nunca</span><span>5 = pasa siempre</span></div>
+    <div id="q-rel" class="rel"></div>
+    <div class="row"><button class="btn ghost" data-go="0">Atrás</button><button class="btn" id="next1" disabled>Siguiente</button></div>
+  </section>
+
+  <!-- COMUNICACIÓN -->
+  <section id="s2" class="hidden">
+    <span class="tag com">Grupo 2 · Comunicación</span>
+    <h2 style="color:var(--green)">aspectos que miden la comunicación</h2>
+    <p class="muted" style="margin-bottom:6px">Sigue pensando en <b id="who2">esa relación</b>.</p>
+    <div class="rubric" style="margin-bottom:16px"><span>1 = no pasa nunca</span><span>5 = pasa siempre</span></div>
+    <div id="q-com" class="com"></div>
+    <div class="row"><button class="btn ghost" data-go="1">Atrás</button><button class="btn" id="next2" disabled>Ver mi resultado</button></div>
+  </section>
+
+  <!-- RESULTADO -->
+  <section id="s3" class="hidden">
+    <h1>tu resultado</h1>
+    <p class="muted" style="margin-bottom:14px" id="resWho"></p>
+    <div class="groups">
+      <div class="g rel"><div class="lbl">Relaciones</div><div class="avg" id="avgRel">–</div><div class="sub">promedio frases 1 a 3</div></div>
+      <div class="g com"><div class="lbl">Comunicación</div><div class="avg" id="avgCom">–</div><div class="sub">promedio frases 4 a 7</div></div>
+    </div>
+    <div class="card bars" id="bars"></div>
+
+    <div id="tieBox" class="hidden">
+      <p class="muted"><b>Hay empate en tu nota más baja.</b> Elige la que más afecta el trabajo:</p>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="reading" id="reading"></div>
+    <div class="focus" id="focus"></div>
+
+    <div class="commit">
+      <h3>Mi acción concreta</h3>
+      <div class="line">
+        <span>Con</span><input type="text" id="cWho" placeholder="persona o área">
+        <span>voy a</span><textarea id="cWhat" rows="2" placeholder="mi acción"></textarea>
+        <span>el día</span><input type="text" id="cDay" placeholder="martes">
+      </div>
+      <button class="btn ochre" id="copy" style="margin-top:14px">Copiar para el chat</button>
+      <p class="copyok" id="copyok"></p>
+      <p style="font-size:12px;opacity:.85">Al chat se copia solo lo que fortaleces y tu acción, sin nombres de personas.</p>
+    </div>
+
+    <button class="btn ghost" id="again">Responder de nuevo</button>
+  </section>
+
+  <footer>
+    <p>Tus respuestas no se guardan ni se envían. Solo tú ves tu resultado.</p>
+    <p>Herramienta de reflexión, Adaptación propia basada en las 7 dimensiones de la coordinación relacional (Gittell, 2002)</p>
+  </footer>
+</div>
+
+<script>
+const DIMS = [
+  {g:"rel", ind:"Metas compartidas", dim:"Metas compartidas", frase:"Tenemos claro el objetivo común del proyecto, más allá de la parte de cada uno.",
+   cons:["Recordar para qué existe el proyecto, no solo mi parte.","Mirar cómo mi tarea afecta la meta del otro."],
+   acc:"Abrir la próxima reunión recordando el objetivo común.", short:"abrir la próxima reunión recordando el objetivo común"},
+  {g:"rel", ind:"Conocimiento compartido", dim:"Conocimiento compartido", frase:"Sé lo que hace el otro y cómo mi trabajo afecta el suyo.",
+   cons:["Entender qué hace el otro y qué le complica.","No suponer: preguntar."],
+   acc:"Preguntar: “¿Qué necesitas de mí para hacer bien tu parte?”", short:"preguntarle qué necesita de mí para hacer bien su parte"},
+  {g:"rel", ind:"Respeto mutuo", dim:"Respeto mutuo", frase:"Nos tratamos con respeto por el trabajo que cada uno hace.",
+   cons:["Valorar el trabajo del otro, aunque sea distinto al mío.","Cuidar el tono, sobre todo bajo presión."],
+   acc:"Reconocer algo concreto que el otro hizo bien.", short:"reconocerle algo concreto que hizo bien"},
+  {g:"com", ind:"Frecuente", dim:"Comunicación frecuente", frase:"Nos comunicamos con la frecuencia que el trabajo requiere.",
+   cons:["No esperar a que haya un problema para hablar.","Tener un espacio fijo y breve."],
+   acc:"Acordar un punto semanal de 10 minutos.", short:"acordar un punto semanal de 10 minutos"},
+  {g:"com", ind:"Oportuna", dim:"Comunicación oportuna", frase:"La información llega a tiempo, no cuando ya es tarde.",
+   cons:["Avisar apenas sé algo, aunque no esté cerrado.","Anticipar en vez de reaccionar."],
+   acc:"Avisar un cambio el mismo día que me entero.", short:"avisar los cambios el mismo día que me entero"},
+  {g:"com", ind:"Precisa", dim:"Comunicación precisa", frase:"La información que intercambiamos es correcta y completa.",
+   cons:["Confirmar que entendimos lo mismo.","Dejar por escrito lo importante."],
+   acc:"Cerrar acuerdos con un correo de tres líneas o en el libro de obra.", short:"cerrar lo acordado con un correo de tres líneas"},
+  {g:"com", ind:"Orientada a resolver problemas", dim:"Resolver antes que culpar", frase:"Cuando algo falla, buscamos la solución antes que el culpable.",
+   cons:["Partir por la solución, no por el responsable.","Ver el error como algo del sistema, no de una persona."],
+   acc:"Preguntar “¿cómo lo resolvemos?” antes de “¿quién fue?”.", short:"partir por “¿cómo lo resolvemos?” antes de “¿quién fue?”"},
+];
+const scores = Array(7).fill(0);
+let chosen = null;
+const $ = (id) => document.getElementById(id);
+
+function renderQs(){
+  ["rel","com"].forEach(g=>{
+    const box = $("q-"+g); box.innerHTML = "";
+    DIMS.forEach((d,i)=>{
+      if(d.g!==g) return;
+      const q = document.createElement("div"); q.className="q";
+      q.innerHTML = `<p><span class="num">${i+1}</span><span class="ind">${d.ind}:</span> ${d.frase}</p><div class="scale" role="group" aria-label="Frase ${i+1}">${[1,2,3,4,5].map(v=>`<button type="button" data-i="${i}" data-v="${v}" aria-label="${v}">${v}</button>`).join("")}</div>`;
+      box.appendChild(q);
+    });
+  });
+  document.querySelectorAll(".scale button").forEach(b=>b.addEventListener("click",()=>{
+    const i=+b.dataset.i, v=+b.dataset.v; scores[i]=v;
+    b.parentElement.querySelectorAll("button").forEach(x=>x.classList.toggle("on", x===b));
+    check();
+  }));
+}
+function check(){
+  $("next1").disabled = !scores.slice(0,3).every(Boolean);
+  $("next2").disabled = !scores.slice(3).every(Boolean);
+}
+function show(n){
+  for(let k=0;k<4;k++) $("s"+k).classList.toggle("hidden", k!==n);
+  $("bar").style.width = [5,40,75,100][n]+"%";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function whoName(){ return $("who").value.trim(); }
+
+$("start").onclick = ()=>{
+  const w = whoName() || "esa relación";
+  $("who1").textContent = w; $("who2").textContent = w;
+  show(1);
+};
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(+b.dataset.go));
+$("next1").onclick = ()=>show(2);
+$("next2").onclick = ()=>{ result(); show(3); };
+$("again").onclick = ()=>{
+  scores.fill(0); chosen=null; $("who").value="";
+  ["cWho","cWhat","cDay"].forEach(id=>$(id).value=""); $("copyok").textContent="";
+  renderQs(); check(); show(0);
+};
+
+function avg(a){ return (a.reduce((x,y)=>x+y,0)/a.length); }
+function fmt(x){ return x.toFixed(1).replace(".",","); }
+
+function result(){
+  const w = whoName();
+  $("resWho").textContent = w ? "Tu relación con: " + w : "";
+  $("avgRel").textContent = fmt(avg(scores.slice(0,3)));
+  $("avgCom").textContent = fmt(avg(scores.slice(3)));
+  const min = Math.min(...scores);
+  const lows = scores.map((s,i)=>s===min?i:-1).filter(i=>i>=0);
+  $("bars").innerHTML = DIMS.map((d,i)=>`
+    <div class="b ${lows.includes(i)?"low":""}"><span class="n">${i+1}</span>
+      <div class="track"><div class="fill" style="width:${scores[i]*20}%;background:${d.g==="rel"?"var(--ochre)":"var(--green)"}"></div></div>
+      <span class="n">${scores[i]}</span><span class="t">${d.dim}</span></div>`).join("");
+  chosen = lows[0];
+  if(lows.length>1){
+    $("tieBox").classList.remove("hidden");
+    $("chips").innerHTML = lows.map(i=>`<button type="button" data-i="${i}">${i+1} · ${DIMS[i].dim}</button>`).join("");
+    $("chips").querySelectorAll("button").forEach(b=>b.onclick=()=>{ chosen=+b.dataset.i; focus(); });
+  } else $("tieBox").classList.add("hidden");
+  $("cWho").value = w;
+  focus();
+}
+
+function focus(){
+  const d = DIMS[chosen], allHigh = Math.min(...scores) >= 4;
+  $("chips").querySelectorAll("button").forEach(b=>b.classList.toggle("on", +b.dataset.i===chosen));
+  const rel = avg(scores.slice(0,3)), com = avg(scores.slice(3));
+  let txt;
+  if(allHigh){
+    txt = `<b>Tu coordinación está en buen pie.</b> Aun así, elige una frase para cuidar: lo que no se cuida, se desgasta.`;
+  } else if(d.g==="rel"){
+    txt = `<b>Lo más bajo está en la relación, la base.</b> Antes de ajustar cómo se comunican, conviene fortalecer el vínculo: la meta común, conocer lo que el otro necesita y el respeto por su trabajo. Cuando la relación es débil, la comunicación se deteriora.`;
+  } else {
+    txt = `<b>Lo más bajo está en la comunicación.</b> ${rel>=com ? "La base de la relación está más firme;" : "Hay trabajo en ambos grupos, pero"} lo urgente es ajustar cómo se comunican: frecuencia, momento, precisión o foco en resolver.`;
+  }
+  $("reading").innerHTML = txt;
+  $("focus").innerHTML = `
+    <span class="tag ${d.g}">${d.g==="rel"?"Relaciones":"Comunicación"} · frase ${chosen+1}</span>
+    <h2 style="color:var(--deep);text-transform:none;font-size:20px">${d.dim}</h2>
+    <p class="quote">“${d.frase}”</p>
+    <p style="font-weight:700;color:var(--deep);margin-bottom:6px">Qué considerar</p>
+    <ul>${d.cons.map(c=>`<li>${c}</li>`).join("")}</ul>
+    <div class="action">Acción sugerida: ${d.acc}</div>`;
+  $("cWhat").value = d.short;
+}
+
+$("copy").onclick = async ()=>{
+  const d = DIMS[chosen];
+  const what = $("cWhat").value.trim() || d.short;
+  const day = $("cDay").value.trim();
+  const line = `Fortalezco: ${d.dim} · Mi acción: ${what}${day? ", el "+day : ""}`;
+  try { await navigator.clipboard.writeText(line); $("copyok").textContent = "Copiado. Pégalo en el chat de Teams si quieres compartirlo."; }
+  catch(e){
+    const ta=document.createElement("textarea"); ta.value=line; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); $("copyok").textContent="Copiado. Pégalo en el chat de Teams si quieres compartirlo."; }
+    catch(_){ $("copyok").textContent = line; }
+    ta.remove();
+  }
+};
+
+renderQs(); show(0);
+</script>
+</body>
+</html>
