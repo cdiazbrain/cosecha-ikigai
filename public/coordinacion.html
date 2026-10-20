@@ -49,17 +49,22 @@
   .row{display:flex;gap:10px}
   .row .btn{flex:1}
   .hidden{display:none}
+  .nav{position:sticky;bottom:0;background:var(--paper);padding:10px 0 14px;margin-top:6px;box-shadow:0 -10px 14px -10px rgba(54,71,77,.25)}
+  .nav .btn{margin-top:0}
   .groups{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
   .g{border-radius:14px;padding:14px;color:#fff}
   .g.rel{background:var(--ochre)} .g.com{background:var(--green)}
   .g .lbl{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
   .g .avg{font-size:30px;font-weight:800;line-height:1.1}
   .g .sub{font-size:12px;opacity:.9}
-  .bars .b{display:grid;grid-template-columns:24px 1fr 28px;align-items:center;gap:8px;margin:7px 0;font-size:13px}
-  .bars .track{height:10px;background:var(--beige);border-radius:9px;overflow:hidden}
+  .g .of{font-size:16px;font-weight:600;opacity:.85;margin-left:2px}
+  .bars{padding:12px 14px}
+  .bars .b{display:grid;grid-template-columns:18px 1fr 80px 16px;align-items:center;gap:8px;margin:5px 0;font-size:12.5px}
+  .bars .lab{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bars .track{height:9px;background:var(--beige);border-radius:9px;overflow:hidden}
   .bars .fill{height:100%;border-radius:9px}
-  .bars .b.low .n{color:var(--red);font-weight:800}
-  .bars .t{font-size:12px;color:var(--slate);grid-column:2/4;margin-top:-6px}
+  .bars .n{font-weight:700;color:var(--deep);text-align:center}
+  .bars .b.low .n,.bars .b.low .lab{color:var(--red);font-weight:800}
   .focus{border:2px solid var(--deep);background:#fff;border-radius:14px;padding:18px;margin-bottom:14px}
   .focus .quote{font-family:"Libre Baskerville",Georgia,serif;font-style:italic;color:var(--slate);font-size:15px;margin:6px 0 12px}
   .focus ul{list-style:none;margin:0 0 12px}
@@ -106,7 +111,7 @@
     <p class="muted" style="margin-bottom:6px">Pensando en <b id="who1">esa relación</b>, ponle nota a cada frase.</p>
     <div class="rubric" style="margin-bottom:16px"><span>1 = no pasa nunca</span><span>5 = pasa siempre</span></div>
     <div id="q-rel" class="rel"></div>
-    <div class="row"><button class="btn ghost" data-go="0">Atrás</button><button class="btn" id="next1" disabled>Siguiente</button></div>
+    <div class="row nav"><button class="btn ghost" data-go="0">Atrás</button><button class="btn" id="next1" disabled>Siguiente</button></div>
   </section>
 
   <!-- COMUNICACIÓN -->
@@ -116,10 +121,10 @@
     <p class="muted" style="margin-bottom:6px">Sigue pensando en <b id="who2">esa relación</b>.</p>
     <div class="rubric" style="margin-bottom:16px"><span>1 = no pasa nunca</span><span>5 = pasa siempre</span></div>
     <div id="q-com" class="com"></div>
-    <div class="row"><button class="btn ghost" data-go="1">Atrás</button><button class="btn" id="next2" disabled>Ver mi resultado</button></div>
+    <div class="row nav"><button class="btn ghost" data-go="1">Atrás</button><button class="btn" id="next2" disabled>Ver resultado</button></div>
   </section>
 
-  <!-- RESULTADO -->
+  <!-- RESULTADO 1: puntajes -->
   <section id="s3" class="hidden">
     <h1>tu resultado</h1>
     <p class="muted" style="margin-bottom:14px" id="resWho"></p>
@@ -128,31 +133,41 @@
       <div class="g com"><div class="lbl">Comunicación</div><div class="avg" id="avgCom">–</div><div class="sub">promedio frases 4 a 7</div></div>
     </div>
     <div class="card bars" id="bars"></div>
+    <div class="row nav"><button class="btn ghost" data-go="2">Atrás</button><button class="btn" data-go="4">Siguiente</button></div>
+  </section>
 
+  <!-- RESULTADO 2: lectura -->
+  <section id="s4" class="hidden">
+    <h1>¿qué me dice?</h1>
     <div id="tieBox" class="hidden">
       <p class="muted"><b>Hay empate en tu nota más baja.</b> Elige la que más afecta el trabajo:</p>
       <div class="chips" id="chips"></div>
     </div>
-
     <div class="reading" id="reading"></div>
-    <div class="focus" id="focus"></div>
+    <div class="row nav"><button class="btn ghost" data-go="3">Atrás</button><button class="btn" data-go="5">Siguiente</button></div>
+  </section>
 
+  <!-- RESULTADO 3: frase a trabajar -->
+  <section id="s5" class="hidden">
+    <h1>lo que voy a trabajar</h1>
+    <div class="focus" id="focus"></div>
+    <div class="row nav"><button class="btn ghost" data-go="4">Atrás</button><button class="btn" data-go="6">Siguiente</button></div>
+  </section>
+
+  <!-- RESULTADO 4: compromiso -->
+  <section id="s6" class="hidden">
+    <h1>mi acción concreta</h1>
     <div class="commit">
-      <h3>Mi acción concreta</h3>
       <div class="line">
         <span>Con</span><input type="text" id="cWho" placeholder="persona o área">
         <span>voy a</span><textarea id="cWhat" rows="2" placeholder="mi acción"></textarea>
         <span>el día</span><input type="text" id="cDay" placeholder="martes">
       </div>
-      <button class="btn ochre" id="copy" style="margin-top:14px">Copiar para el chat</button>
-      <p class="copyok" id="copyok"></p>
-      <p style="font-size:12px;opacity:.85">Al chat se copia solo lo que fortaleces y tu acción, sin nombres de personas.</p>
     </div>
-
-    <button class="btn ghost" id="again">Responder de nuevo</button>
+    <div class="row nav"><button class="btn ghost" data-go="5">Atrás</button><button class="btn" id="again">Repetir</button></div>
   </section>
 
-  <footer>
+  <footer id="foot">
     <p>Tus respuestas no se guardan ni se envían. Solo tú ves tu resultado.</p>
     <p>Herramienta de reflexión, Adaptación propia basada en las 7 dimensiones de la coordinación relacional (Gittell, 2002)</p>
   </footer>
@@ -207,8 +222,9 @@ function check(){
   $("next2").disabled = !scores.slice(3).every(Boolean);
 }
 function show(n){
-  for(let k=0;k<4;k++) $("s"+k).classList.toggle("hidden", k!==n);
-  $("bar").style.width = [5,40,75,100][n]+"%";
+  for(let k=0;k<7;k++) $("s"+k).classList.toggle("hidden", k!==n);
+  $("bar").style.width = [5,25,45,62,75,88,100][n]+"%";
+  $("foot").classList.toggle("hidden", n!==0);
   window.scrollTo({top:0,behavior:"smooth"});
 }
 function whoName(){ return $("who").value.trim(); }
@@ -223,7 +239,7 @@ $("next1").onclick = ()=>show(2);
 $("next2").onclick = ()=>{ result(); show(3); };
 $("again").onclick = ()=>{
   scores.fill(0); chosen=null; $("who").value="";
-  ["cWho","cWhat","cDay"].forEach(id=>$(id).value=""); $("copyok").textContent="";
+  ["cWho","cWhat","cDay"].forEach(id=>$(id).value="");
   renderQs(); check(); show(0);
 };
 
@@ -233,14 +249,14 @@ function fmt(x){ return x.toFixed(1).replace(".",","); }
 function result(){
   const w = whoName();
   $("resWho").textContent = w ? "Tu relación con: " + w : "";
-  $("avgRel").textContent = fmt(avg(scores.slice(0,3)));
-  $("avgCom").textContent = fmt(avg(scores.slice(3)));
+  $("avgRel").innerHTML = fmt(avg(scores.slice(0,3))) + '<span class="of">/5,0</span>';
+  $("avgCom").innerHTML = fmt(avg(scores.slice(3))) + '<span class="of">/5,0</span>';
   const min = Math.min(...scores);
   const lows = scores.map((s,i)=>s===min?i:-1).filter(i=>i>=0);
   $("bars").innerHTML = DIMS.map((d,i)=>`
-    <div class="b ${lows.includes(i)?"low":""}"><span class="n">${i+1}</span>
+    <div class="b ${lows.includes(i)?"low":""}"><span class="n">${i+1}</span><span class="lab">${d.ind}</span>
       <div class="track"><div class="fill" style="width:${scores[i]*20}%;background:${d.g==="rel"?"var(--ochre)":"var(--green)"}"></div></div>
-      <span class="n">${scores[i]}</span><span class="t">${d.dim}</span></div>`).join("");
+      <span class="n">${scores[i]}</span></div>`).join("");
   chosen = lows[0];
   if(lows.length>1){
     $("tieBox").classList.remove("hidden");
@@ -273,20 +289,6 @@ function focus(){
     <div class="action">Acción sugerida: ${d.acc}</div>`;
   $("cWhat").value = d.short;
 }
-
-$("copy").onclick = async ()=>{
-  const d = DIMS[chosen];
-  const what = $("cWhat").value.trim() || d.short;
-  const day = $("cDay").value.trim();
-  const line = `Fortalezco: ${d.dim} · Mi acción: ${what}${day? ", el "+day : ""}`;
-  try { await navigator.clipboard.writeText(line); $("copyok").textContent = "Copiado. Pégalo en el chat de Teams si quieres compartirlo."; }
-  catch(e){
-    const ta=document.createElement("textarea"); ta.value=line; document.body.appendChild(ta); ta.select();
-    try{ document.execCommand("copy"); $("copyok").textContent="Copiado. Pégalo en el chat de Teams si quieres compartirlo."; }
-    catch(_){ $("copyok").textContent = line; }
-    ta.remove();
-  }
-};
 
 renderQs(); show(0);
 </script>
